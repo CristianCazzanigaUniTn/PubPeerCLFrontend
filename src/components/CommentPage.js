@@ -24,7 +24,6 @@ export default function CommentPage({ apiKey, userNickname }) {
         "external link"
     ];
 
-    // --- HELPER: formato commento ---
     const formatComment = (doc) => {
         if (!doc) return null;
         return {
@@ -40,7 +39,6 @@ export default function CommentPage({ apiKey, userNickname }) {
         };
     };
 
-    // --- FETCH COMMENT ---
     const fetchComment = async () => {
         if (!apiKey) return;
         setLoading(true);
@@ -50,20 +48,17 @@ export default function CommentPage({ apiKey, userNickname }) {
         try {
             let url;
             if (id) {
-                // Carica commento specifico
                 url = `https://pubpeerclassifierapi.onrender.com/api/comments/article/${id}`;
             } else {
-                // Commento random
                 url = `https://pubpeerclassifierapi.onrender.com/api/comments/random/1`;
             }
 
             const res = await fetch(url, { headers: { "x-api-key": apiKey } });
-            if (!res.ok) throw new Error(`Errore caricamento: ${res.status}`);
+            if (!res.ok) throw new Error(`Loading error: ${res.status}`);
             const data = await res.json();
             const newComment = id ? data : data[0];
             setComment(formatComment(newComment));
 
-            // Se è random, aggiorna URL
             if (!id && newComment) {
                 internalNavigation.current = true;
                 navigate(`/comment/${newComment.comment_id}`, { replace: true });
@@ -71,25 +66,24 @@ export default function CommentPage({ apiKey, userNickname }) {
 
         } catch (err) {
             console.error(err);
-            setError("Errore durante il caricamento del commento.");
+            setError("Error while loading the comment.");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-    if (!apiKey) return;
-    if (internalNavigation.current) {
-        internalNavigation.current = false;
-        return;
-    }
-    fetchComment();
+        if (!apiKey) return;
+        if (internalNavigation.current) {
+            internalNavigation.current = false;
+            return;
+        }
+        fetchComment();
     }, [apiKey, id]);
 
-    // --- CLASSIFICA COMMENTO ---
     const handleClassify = async () => {
         if (!category || !comment?.comment_id) {
-            alert("Seleziona una categoria prima di inviare.");
+            alert("Select a category before submitting.");
             return;
         }
 
@@ -113,20 +107,18 @@ export default function CommentPage({ apiKey, userNickname }) {
             );
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
-                throw new Error(errData.error || `Errore server ${res.status}`);
+                throw new Error(errData.error || `Server error ${res.status}`);
             }
 
-            // Dopo invio, carica nuovo commento random
             fetchNextComment();
         } catch (err) {
             console.error(err);
-            alert(`Errore: ${err.message}`);
+            alert(`Error: ${err.message}`);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    // --- NEXT COMMENT ---
     const fetchNextComment = async () => {
         if (!apiKey) return;
         setLoading(true);
@@ -138,17 +130,17 @@ export default function CommentPage({ apiKey, userNickname }) {
                 "https://pubpeerclassifierapi.onrender.com/api/comments/random/1",
                 { headers: { "x-api-key": apiKey } }
             );
-            if (!res.ok) throw new Error(`Errore caricamento: ${res.status}`);
+            if (!res.ok) throw new Error(`Loading error: ${res.status}`);
             const data = await res.json();
             const nextComment = data[0];
             if (nextComment) {
                 const formatted = formatComment(nextComment);
-                setComment(formatted); // aggiorna stato
-                navigate(`/comment/${formatted.comment_id}`, { replace: false }); // aggiorna URL
+                setComment(formatted);
+                navigate(`/comment/${formatted.comment_id}`, { replace: false });
             }
         } catch (err) {
             console.error(err);
-            setError("Errore durante il caricamento del prossimo commento.");
+            setError("Error while loading the next comment.");
         } finally {
             setLoading(false);
         }
@@ -162,18 +154,17 @@ export default function CommentPage({ apiKey, userNickname }) {
             <div className="blob b-light-2"></div>
             <div className="blob b-light-3"></div>
 
-
             <div className="comment-main-card" onClick={() => setIsUserMenuOpen(false)}>
                 {loading ? (
                     <div className="status-msg">
                         <div className="spinner"></div>
-                        <p>Cercando un commento...</p>
+                        <p>Searching for a comment...</p>
                     </div>
                 ) : error ? (
                     <div className="status-msg error">
                         <p>{error}</p>
                         <button onClick={fetchComment} className="retry-btn">
-                            Riprova
+                            Retry
                         </button>
                     </div>
                 ) : comment ? (
@@ -182,18 +173,16 @@ export default function CommentPage({ apiKey, userNickname }) {
                             <div className="header-top">
                                 <div className="badge main-badge">PubPeer Analysis</div>
                                 <div
-                                    className={`badge author-badge ${comment.is_from_author ? "is-author" : "is-peer"
-                                        }`}
+                                    className={`badge author-badge ${comment.is_from_author ? "is-author" : "is-peer"}`}
                                 >
-                                    {comment.is_from_author ? "🖋️ Author" : "🔍 User (No Author)"}
+                                    {comment.is_from_author ? "🖋️ Author" : "🔍 User (Not Author)"}
                                 </div>
                             </div>
-                            <h2>Classifica il commento</h2>
+                            <h2>Classify the comment</h2>
                         </div>
 
                         <div
-                            className={`comment-content-box ${comment.is_from_author ? "author-style" : ""
-                                }`}
+                            className={`comment-content-box ${comment.is_from_author ? "author-style" : ""}`}
                             dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(comment.comment_content, {
                                     ADD_ATTR: ["target"]
@@ -201,19 +190,18 @@ export default function CommentPage({ apiKey, userNickname }) {
                             }}
                         />
 
-                        {/* --- METADATA ARTICOLO --- */}
                         <div className="article-meta">
                             <p>
-                                <strong>Titolo:</strong>{" "}
+                                <strong>Title:</strong>{" "}
                                 <a href={comment.url_articolo} target="_blank" rel="noopener noreferrer">
                                     {comment.titolo_articolo}
                                 </a>
                             </p>
                             <p>
-                                <strong>Autori:</strong> {comment.autori_articolo}
+                                <strong>Authors:</strong> {comment.autori_articolo}
                             </p>
                             <p>
-                                <strong>Rivista:</strong> {comment.rivista_articolo}
+                                <strong>Journal:</strong> {comment.rivista_articolo}
                             </p>
                             <p>
                                 <strong>DOI:</strong>{" "}
@@ -235,9 +223,8 @@ export default function CommentPage({ apiKey, userNickname }) {
                             </p>
                         </div>
 
-                        {/* --- CLASSIFICAZIONE --- */}
                         <div className="classification-area">
-                            <label>Scegli la categoria più appropriata:</label>
+                            <label>Choose the most appropriate category:</label>
                             <div className="category-grid">
                                 {categories.map((cat) => (
                                     <button
@@ -256,20 +243,20 @@ export default function CommentPage({ apiKey, userNickname }) {
                                     onClick={fetchNextComment}
                                     disabled={issubmitting}
                                 >
-                                    Salta / Prossimo
+                                    Skip / Next
                                 </button>
                                 <button
                                     className="submit-classification"
                                     disabled={!category || issubmitting}
                                     onClick={handleClassify}
                                 >
-                                    {issubmitting ? "Inviando..." : "Conferma e Invia"}
+                                    {issubmitting ? "Submitting..." : "Confirm and Submit"}
                                 </button>
                             </div>
                         </div>
                     </>
                 ) : (
-                    <p>Nessun commento trovato.</p>
+                    <p>No comment found.</p>
                 )}
             </div>
         </div>

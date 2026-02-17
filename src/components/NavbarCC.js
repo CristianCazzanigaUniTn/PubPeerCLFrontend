@@ -27,8 +27,8 @@ export default function Navbar({ userNickname }) {
         </div>
 
         <div className={`navbar-links ${isMenuOpen ? "active" : ""}`}>
-          <Link to="/comment" onClick={() => setIsMenuOpen(false)}>Classifica</Link>
-          <Link to="/comment-list" onClick={() => setIsMenuOpen(false)}>Esplora</Link>
+          <Link to="/comment" onClick={() => setIsMenuOpen(false)}>Classify</Link>
+          <Link to="/comment-list" onClick={() => setIsMenuOpen(false)}>Explore</Link>
           
           <div className="user-dropdown-container">
             <div className="navbar-user">
@@ -37,7 +37,7 @@ export default function Navbar({ userNickname }) {
 
             <div className="user-dropdown-menu">
               <button onClick={handleLogoutClick} className="logout-btn">
-                <span>🚪</span> Esci
+                <span>🚪</span> Logout
               </button>
             </div>
           </div>
@@ -56,14 +56,14 @@ export default function Navbar({ userNickname }) {
       {showLogoutModal && (
         <div className="modal-overlay">
           <div className="modal-card">
-            <h3>Sei sicuro di voler uscire?</h3>
-            <p>Dovrai reinserire la tua API Key per accedere di nuovo.</p>
+            <h3>Are you sure you want to log out?</h3>
+            <p>You will need to re-enter your API Key to access again.</p>
             <div className="modal-actions">
               <button onClick={() => setShowLogoutModal(false)} className="btn-cancel">
-                No, resta
+                No, stay
               </button>
               <button onClick={confirmLogout} className="btn-confirm">
-                Sì, esci
+                Yes, log out
               </button>
             </div>
           </div>
