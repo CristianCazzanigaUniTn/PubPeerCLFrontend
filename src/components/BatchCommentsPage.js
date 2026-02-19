@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/BatchCommentsPage.css";
+import API_BASE_URL from "../config";
 
 export default function BatchCommentsPage({ apiKey }) {
   const [comments, setComments] = useState([]);
@@ -14,7 +15,7 @@ export default function BatchCommentsPage({ apiKey }) {
     setError("");
     try {
       const res = await fetch(
-        "https://pubpeerclassifierapi.onrender.com/api/comments/random/25",
+        `${API_BASE_URL}/api/comments/random/25`,
         { headers: { "x-api-key": apiKey } }
       );
       if (!res.ok) throw new Error(`Error: ${res.status}`);

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import "../styles/CommentPage.css";
 import { useRef } from "react";
-
+import API_BASE_URL from "../config";
 
 export default function CommentPage({ apiKey, userNickname }) {
     const { id } = useParams(); // ID commento dall'URL
@@ -48,9 +48,9 @@ export default function CommentPage({ apiKey, userNickname }) {
         try {
             let url;
             if (id) {
-                url = `https://pubpeerclassifierapi.onrender.com/api/comments/article/${id}`;
+                url = `${API_BASE_URL}/api/comments/article/${id}`;
             } else {
-                url = `https://pubpeerclassifierapi.onrender.com/api/comments/random/1`;
+                url = `${API_BASE_URL}/api/comments/random/1`;
             }
 
             const res = await fetch(url, { headers: { "x-api-key": apiKey } });
@@ -95,7 +95,7 @@ export default function CommentPage({ apiKey, userNickname }) {
         setIsSubmitting(true);
         try {
             const res = await fetch(
-                `https://pubpeerclassifierapi.onrender.com/api/comments/classify/${comment.comment_id}`,
+                `${API_BASE_URL}/api/comments/classify/${comment.comment_id}`,
                 {
                     method: "POST",
                     headers: {
@@ -127,7 +127,7 @@ export default function CommentPage({ apiKey, userNickname }) {
 
         try {
             const res = await fetch(
-                "https://pubpeerclassifierapi.onrender.com/api/comments/random/1",
+                "${API_BASE_URL}/api/comments/random/1",
                 { headers: { "x-api-key": apiKey } }
             );
             if (!res.ok) throw new Error(`Loading error: ${res.status}`);
